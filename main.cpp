@@ -18,6 +18,8 @@
 #include "svn_mergeinfo.h"
 #include "svn_version.h"
 
+namespace ryppl {
+  
 extern "C"
 {
   // The parser has discovered a new revision record within the parsing
@@ -169,8 +171,12 @@ parse_baton_initialize(struct parse_baton_t **pb, apr_pool_t *pool)
     return SVN_NO_ERROR;
 }
 
+}
+
 int main()
 {
+    using namespace ryppl;
+    
     /* Create our top-level pool.  Use a separate mutexless allocator,
      * given this application is single threaded.
      */
