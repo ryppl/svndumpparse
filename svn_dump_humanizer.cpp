@@ -6,14 +6,28 @@
 #include <iostream>
 #include <string>
 #include <svn_string.h>
+#include <apr_hash.h>
 
 namespace ryppl {
+
+static void dump_headers(apr_pool_t* pool, apr_hash_t* headers, char const* prefix)
+{
+    for (apr_hash_index_t* i = apr_hash_first(pool, headers); i; i = apr_hash_next(i))
+    {
+        char const* key;
+        char const* val;
+        apr_hash_this(i, (const void**)&key, NULL, (void**)&val);
+        
+        std::cout << prefix << "( " << key << ": " << val << ")" << std::endl;
+    }
+}
 
 // The parser has discovered a new revision record
 void svn_dump_humanizer::begin_revision(apr_hash_t *headers, apr_pool_t *pool)
 {
     ++rev_num;
     std::cout << "{ revision: " << rev_num << std::endl;
+    dump_headers(pool, headers, "  ");
 }
 
 // The parser has discovered a new uuid record
@@ -27,7 +41,7 @@ void svn_dump_humanizer::uuid_record(const char *uuid, apr_pool_t *pool)
 void svn_dump_humanizer::begin_node(apr_hash_t *headers, apr_pool_t *pool)
 {
     std::cout << "  { node " << std::endl;
-    
+    dump_headers(pool, headers, "    ");
 }
     
 // set a named property of the current revision to value. 
