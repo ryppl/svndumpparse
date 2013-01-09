@@ -35,9 +35,8 @@ struct svn_dump_humanizer : svn_dump_parser
     // remove all properties of the current node.
     void remove_node_props();
     
-    // receive a writable stream capable of receiving the current
-    // node's fulltext.
-    void set_fulltext(svn_stream_t **stream);
+    void write_fulltext_stream(const char *data, apr_size_t *len);
+    void close_fulltext_stream();
     
     // For a given node_baton, set handler and handler_baton to a window
     // handler and baton capable of receiving a delta against the node's

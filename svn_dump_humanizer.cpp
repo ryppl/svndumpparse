@@ -76,14 +76,16 @@ void svn_dump_humanizer::remove_node_props()
               << " ]" << std::endl;
 }
     
-// receive a writable stream capable of receiving the current
-// node's fulltext.
-void svn_dump_humanizer::set_fulltext(svn_stream_t **stream)
+void svn_dump_humanizer::write_fulltext_stream(const char *data, apr_size_t *len)
 {
-    std::cout << "    [ fulltext "
-              << " ]" << std::endl;
+    std::cout << "<fulltext: " << *len << "> ";
 }
-    
+
+void svn_dump_humanizer::close_fulltext_stream()
+{
+    std::cout << "<EOS>" << std::endl;
+}
+
 void svn_dump_humanizer::apply_textdelta(svn_txdelta_window_t *window)
 {
     std::cout << "    [ textdelta "

@@ -4,6 +4,8 @@
 #ifndef SVN_DUMP_PARSER_DWA201319_HPP
 # define SVN_DUMP_PARSER_DWA201319_HPP
 
+# include <apr.h>
+
 struct svn_stream_t;
 struct apr_pool_t;
 struct apr_hash_t;
@@ -43,9 +45,8 @@ struct svn_dump_parser
     // remove all properties of the current node.
     virtual void remove_node_props() = 0;
     
-    // receive a writable stream capable of receiving the current
-    // node's fulltext.
-    virtual void set_fulltext(svn_stream_t **stream) = 0;
+    virtual void write_fulltext_stream(const char *data, apr_size_t *len) = 0;
+    virtual void close_fulltext_stream() = 0;
     
     // For a given node_baton, set handler and handler_baton to a window
     // handler and baton capable of receiving a delta against the node's

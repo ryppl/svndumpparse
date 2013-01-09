@@ -24,6 +24,13 @@
 
 namespace ryppl {
 
+extern "C"
+{
+  svn_error_t *text_stream_writer(
+      void *baton, const char *data, apr_size_t *len);
+  svn_error_t *text_stream_closer(void *baton);
+}
+
 struct svn_dump_parser::backdoor
 {
     // The parser has discovered a new revision record
@@ -73,7 +80,9 @@ struct svn_dump_parser::backdoor
     // node's fulltext.
     static void set_fulltext(svn_dump_parser* parser, svn_stream_t **stream)
     {
-        parser->set_fulltext(stream);
+        *stream = svn_stream_create(parser, parser->pool);
+        svn_stream_set_write(*stream, text_stream_writer);
+        svn_stream_set_close(*stream, text_stream_closer);
     }
     
     // For a given node_baton, set handler and handler_baton to a window
@@ -95,6 +104,17 @@ struct svn_dump_parser::backdoor
     {
         parser->end_revision();
     }
+
+    static void write_fulltext_stream(svn_dump_parser* parser, const char *data, apr_size_t *len)
+    {
+        parser->write_fulltext_stream(data, len);
+    }
+    
+    static void close_fulltext_stream(svn_dump_parser* parser)
+    {
+        parser->close_fulltext_stream();
+    }
+    
 };
 
 namespace svn_parse_detail {
@@ -221,6 +241,26 @@ extern "C"
       RYPPL_HANDLE_SVN_EXCEPTION(
           svn_dump_parser* parser = static_cast<svn_dump_parser*>(revision_baton);
           svn_dump_parser::backdoor::end_revision(parser);
+      )
+  }
+
+  svn_error_t *text_stream_writer(
+      void *baton, const char *data, apr_size_t *len)
+  {
+      RYPPL_HANDLE_SVN_EXCEPTION(
+          svn_dump_parser* parser = static_cast<svn_dump_parser*>(baton);
+          svn_dump_parser::backdoor::write_fulltext_stream(parser, data, len);
+      )
+  }
+
+
+  // Close function for the publically returned stream. */
+  svn_error_t *
+  text_stream_closer(void *baton)
+  {
+      RYPPL_HANDLE_SVN_EXCEPTION(
+          svn_dump_parser* parser = static_cast<svn_dump_parser*>(baton);
+          svn_dump_parser::backdoor::close_fulltext_stream(parser);
       )
   }
 }
