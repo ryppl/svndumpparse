@@ -191,13 +191,10 @@ int main()
     apr_pool_t *pool;
     pool = svn_pool_create_ex(NULL, allocator);
     apr_allocator_owner_set(allocator, pool);
-
-    if (svn_error_t* err = svn_fs_initialize(pool))
-        return EXIT_FAILURE;
-
+    
     try
     {
-        check_svn_error(svn_fs_initialize(pool));
+        check_svn_failure(svn_fs_initialize(pool));
         
         parser parse(pool);
         
