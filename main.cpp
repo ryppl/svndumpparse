@@ -141,9 +141,8 @@ svn_repos_parse_fns2_t parse_vtable =
 };
 
 // Lifted out of subversion/svndumpfilter/main.c
-static svn_error_t*
+static svn_stream_t*
 create_stdio_stream(
-    svn_stream_t **stream,
     APR_DECLARE(apr_status_t) open_fn(apr_file_t **, apr_pool_t *),
     apr_pool_t *pool)
 {
@@ -151,32 +150,27 @@ create_stdio_stream(
   apr_status_t apr_err = open_fn(&stdio_file, pool);
 
   if (apr_err)
-    return svn_error_wrap_apr(apr_err, "Can't open stdio file");
+      check_svn_error(svn_error_wrap_apr(apr_err, "Can't open stdio file"));
 
-  *stream = svn_stream_from_aprfile2(stdio_file, TRUE, pool);
-  return SVN_NO_ERROR;
+  return svn_stream_from_aprfile2(stdio_file, TRUE, pool);
 }
 
 struct parser
 {
     parser(apr_pool_t* pool)
-        : pool(pool), in_stream(0), out_stream(0), rev_num(0)
+        : pool(pool), rev_num(0)
     {
-        /* Read the stream from STDIN.  Users can redirect a file. */
-        check_svn_error(
-            create_stdio_stream(&(this->in_stream), apr_file_open_stdin, pool));
-
-        /* Have the parser dump results to STDOUT. Users can redirect a file. */
-        check_svn_error(
-            create_stdio_stream(&(this->out_stream), apr_file_open_stdout, pool));
     }
 
+    void operator()(svn_stream_t* in_stream)
+    {
+        check_svn_error(
+            svn_repos_parse_dumpstream2(
+                in_stream, &parse_vtable, this, NULL, NULL, pool));
+    }
+        
     apr_pool_t* pool;
     
-    // Input and output streams.
-    svn_stream_t* in_stream;
-    svn_stream_t* out_stream;
-
     // Revision number
     unsigned rev_num;
 };
@@ -203,11 +197,11 @@ int main()
 
     try
     {
-        parser parser(pool);
-    
-        check_svn_error(
-            svn_repos_parse_dumpstream2(
-                parser.in_stream, &parse_vtable, &parser, NULL, NULL, pool));
+        check_svn_error(svn_fs_initialize(pool));
+        
+        parser parse(pool);
+        
+        parse(create_stdio_stream(apr_file_open_stdin, pool));
     }
     catch(svn_error const& x)
     {
