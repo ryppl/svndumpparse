@@ -7,9 +7,19 @@ find_package(APR)
 
 include_directories(${SUBVERSION_INCLUDE_DIRS} ${APR_INCLUDE_DIRS})
 
-add_executable(convert
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+endif()
+
+add_executable(modhist
   main.cpp)
 
-target_link_libraries(convert ${SUBVERSION_LIBRARIES} ${APR_LIBRARY})
+foreach(flag ${CXX11_FEATURE_LIST})
+  set_property(TARGET modhist
+	APPEND PROPERTY COMPILE_DEFINITIONS ${flag}
+	)
+endforeach()
+
+target_link_libraries(modhist ${SUBVERSION_LIBRARIES} ${APR_LIBRARY})
 
 
