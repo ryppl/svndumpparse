@@ -13,6 +13,7 @@ endif()
 
 add_executable(modhist
   main.cpp
+  svn_failure.cpp
   svn_dump_parser.cpp
 )
 

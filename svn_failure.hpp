@@ -5,7 +5,8 @@
 # define SVN_FAILURE_DWA201319_HPP
 
 # include <exception>
-# include <svn_types.h>
+
+struct svn_error_t;
 
 namespace ryppl {
 
@@ -14,10 +15,7 @@ struct svn_failure : std::exception
     explicit svn_failure(::svn_error_t* err)
         : err(err) {}
 
-    char const* what() const throw()
-    {
-        return err->message;
-    }
+    char const* what() const throw();
     
     ::svn_error_t* err;
 };
@@ -28,6 +26,12 @@ inline void check_svn_failure(::svn_error_t* err)
         throw svn_failure(err);
 }
 
+svn_error_t* current_exception_to_svn_error();
+
+# define RYPPL_HANDLE_SVN_EXCEPTION(...)                \
+    try { __VA_ARGS__ } catch(...) {                    \
+        return current_exception_to_svn_error();        \
+    } return 0;
 }
 
 #endif // SVN_FAILURE_DWA201319_HPP
