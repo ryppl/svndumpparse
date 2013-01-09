@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <svn_string.h>
+#include <svn_delta.h>
 #include <apr_hash.h>
 
 namespace ryppl {
@@ -88,9 +89,24 @@ void svn_dump_humanizer::close_fulltext_stream()
 
 void svn_dump_humanizer::apply_textdelta(svn_txdelta_window_t *window)
 {
-    std::cout << "    [ textdelta "
-              << " ]" << std::endl;
+    if (!window)
+    {
+        std::cout << "    [ textdelta (NULL) ]" << std::endl;
+    }
+    else
+    {
+        std::cout << "    [ textdelta " << std::endl;
+
+        std::cout << "        sview_offset: " << window->sview_offset
+                  << " sview_len: " << window->sview_len
+                  << " tview_len: " << window->tview_len
+                  << std::endl;
     
+        std::cout << "      num_ops: " << window->num_ops
+                  << " src_ops: " << window->src_ops << std::endl;
+    
+        std::cout << "    ]" << std::endl;
+    }
 }
     
 // The parser has reached the end of the current node
