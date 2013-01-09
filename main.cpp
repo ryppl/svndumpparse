@@ -24,9 +24,9 @@
 
 namespace ryppl {
 
-struct svn_error : std::exception
+struct svn_failure : std::exception
 {
-    explicit svn_error(::svn_error_t* err)
+    explicit svn_failure(::svn_error_t* err)
         : err(err) {}
 
     char const* what() const throw()
@@ -37,10 +37,10 @@ struct svn_error : std::exception
     ::svn_error_t* err;
 };
 
-inline void check_svn_error(::svn_error_t* err)
+inline void check_svn_failure(::svn_error_t* err)
 {
     if (err)
-        throw svn_error(err);
+        throw svn_failure(err);
 }
 
 extern "C"
@@ -150,7 +150,7 @@ create_stdio_stream(
   apr_status_t apr_err = open_fn(&stdio_file, pool);
 
   if (apr_err)
-      check_svn_error(svn_error_wrap_apr(apr_err, "Can't open stdio file"));
+      check_svn_failure(svn_error_wrap_apr(apr_err, "Can't open stdio file"));
 
   return svn_stream_from_aprfile2(stdio_file, TRUE, pool);
 }
@@ -164,7 +164,7 @@ struct parser
 
     void operator()(svn_stream_t* in_stream)
     {
-        check_svn_error(
+        check_svn_failure(
             svn_repos_parse_dumpstream2(
                 in_stream, &parse_vtable, this, NULL, NULL, pool));
     }
@@ -200,7 +200,7 @@ int main()
         
         parse(create_stdio_stream(apr_file_open_stdin, pool));
     }
-    catch(svn_error const& x)
+    catch(svn_failure const& x)
     {
         std::cerr << "Failed with svn error: " << x.what() << std::endl;
         return EXIT_FAILURE;
