@@ -19,7 +19,26 @@
 #include "svn_version.h"
 
 namespace ryppl {
-  
+
+struct svn_error : std::exception
+{
+    explicit svn_error(::svn_error_t* err)
+        : err(err) {}
+
+    char const* what() const throw()
+    {
+        return err->message;
+    }
+    
+    ::svn_error_t* err;
+};
+
+inline void check_svn_error(::svn_error_t* err)
+{
+    if (err)
+        throw svn_error(err);
+}
+
 extern "C"
 {
   // The parser has discovered a new revision record within the parsing
