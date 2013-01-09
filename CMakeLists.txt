@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-# include(FindSubversionLibrary)
-
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
 
 find_package(SubversionLibrary 1.78)
 find_package(APR)
