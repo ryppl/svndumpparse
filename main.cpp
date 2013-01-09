@@ -21,64 +21,84 @@
 
 extern "C"
 {
-    
-static svn_error_t * new_revision_record(void **revision_baton, apr_hash_t *headers, void *parse_baton, apr_pool_t *pool)
- // The parser has discovered a new revision record within the parsing session represented by parse_baton.
-{
-    return 0;
-}
-    
-static svn_error_t * uuid_record(const char *uuid, void *parse_baton, apr_pool_t *pool)
- // The parser has discovered a new uuid record within the parsing session represented by parse_baton.
-{
-    return 0;
-}
-static svn_error_t * new_node_record(void **node_baton, apr_hash_t *headers, void *revision_baton, apr_pool_t *pool)
- // The parser has discovered a new node record within the current revision represented by revision_baton.
-{
-    return 0;
-}    
-static svn_error_t * set_revision_property(void *revision_baton, const char *name, const svn_string_t *value)
- // For a given revision_baton, set a property name to value. 
-{
-    return 0;
-}    
-static svn_error_t * set_node_property(void *node_baton, const char *name, const svn_string_t *value)
- // For a given node_baton, set a property name to value. 
-{
-    return 0;
-}    
-static svn_error_t * delete_node_property(void *node_baton, const char *name)
- // For a given node_baton, delete property name. 
-{
-    return 0;
-}    
-static svn_error_t * remove_node_props(void *node_baton)
- // For a given node_baton, remove all properties. 
-{
-    return 0;
-}    
-static svn_error_t * set_fulltext(svn_stream_t **stream, void *node_baton)
- // For a given node_baton, receive a writable stream capable of receiving the node's fulltext. 
-{
-    return 0;
-}    
-static svn_error_t * apply_textdelta(svn_txdelta_window_handler_t *handler, void **handler_baton, void *node_baton)
- // For a given node_baton, set handler and handler_baton to a window handler and baton capable of receiving a delta against the node's previous contents. 
-{
-    return 0;
-}    
-static svn_error_t * close_node(void *node_baton)
- // The parser has reached the end of the current node represented by node_baton, it can be freed. 
-{
-    return 0;
-}    
-static svn_error_t * close_revision(void *revision_baton)
- // The parser has reached the end of the current revision represented by revision_baton. 
-{
-    return 0;
-}
+  // The parser has discovered a new revision record within the parsing
+  // session represented by parse_baton.
+  static svn_error_t* new_revision_record(
+      void **revision_baton, apr_hash_t *headers, void *parse_baton, apr_pool_t *pool)
+  {
+      return 0;
+  }
 
+  // The parser has discovered a new uuid record within the parsing
+  // session represented by parse_baton.
+  static svn_error_t* uuid_record(const char *uuid, void *parse_baton, apr_pool_t *pool)
+  {
+      return 0;
+  }
+    
+  // The parser has discovered a new node record within the current
+  // revision represented by revision_baton.
+  static svn_error_t* new_node_record(
+      void **node_baton, apr_hash_t *headers, void *revision_baton, apr_pool_t *pool)
+  {
+      return 0;
+  }
+    
+  // For a given revision_baton, set a property name to value. 
+  static svn_error_t* set_revision_property(
+      void *revision_baton, const char *name, const svn_string_t *value)
+  {
+      return 0;
+  }
+    
+  // For a given node_baton, set a property name to value. 
+  static svn_error_t* set_node_property(
+      void *node_baton, const char *name, const svn_string_t *value)
+  {
+      return 0;
+  }
+    
+  // For a given node_baton, delete property name. 
+  static svn_error_t* delete_node_property(void *node_baton, const char *name)
+  {
+      return 0;
+  }
+    
+  // For a given node_baton, remove all properties. 
+  static svn_error_t* remove_node_props(void *node_baton)
+  {
+      return 0;
+  }
+    
+  // For a given node_baton, receive a writable stream capable of
+  // receiving the node's fulltext.
+  static svn_error_t* set_fulltext(svn_stream_t **stream, void *node_baton)
+  {
+      return 0;
+  }
+    
+  // For a given node_baton, set handler and handler_baton to a window
+  // handler and baton capable of receiving a delta against the node's
+  // previous contents.
+  static svn_error_t* apply_textdelta(
+      svn_txdelta_window_handler_t *handler, void **handler_baton, void *node_baton)
+  {
+      return 0;
+  }
+    
+  // The parser has reached the end of the current node represented by
+  // node_baton, it can be freed.
+  static svn_error_t* close_node(void *node_baton)
+  {
+      return 0;
+  }
+    
+  // The parser has reached the end of the current revision
+  // represented by revision_baton.
+  static svn_error_t* close_revision(void *revision_baton)
+  {
+      return 0;
+  }
 }
 
 svn_repos_parse_fns2_t parse_vtable =
@@ -115,7 +135,7 @@ struct parse_baton_t
    directly wrap the OS's file-handles, which don't know or care about
    translation.  Thus dump/load works correctly on Win32.
 */
-static svn_error_t *
+static svn_error_t*
 create_stdio_stream(svn_stream_t **stream,
                     APR_DECLARE(apr_status_t) open_fn(apr_file_t **,
                                                       apr_pool_t *),
@@ -132,7 +152,7 @@ create_stdio_stream(svn_stream_t **stream,
 }
 
 
-static svn_error_t *
+static svn_error_t*
 parse_baton_initialize(struct parse_baton_t **pb, apr_pool_t *pool)
 {
     struct parse_baton_t *baton = static_cast<parse_baton_t*>(
@@ -165,7 +185,7 @@ int main()
     pool = svn_pool_create_ex(NULL, allocator);
     apr_allocator_owner_set(allocator, pool);
 
-    if (svn_error_t *err = svn_fs_initialize(pool))
+    if (svn_error_t* err = svn_fs_initialize(pool))
         return EXIT_FAILURE;
 
     parse_baton_t* pb;
