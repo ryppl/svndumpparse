@@ -2,6 +2,9 @@
 // Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <exception>
+#include <iostream>
+
 #include <svn_repos.h>
 #include "svn_error.h"
 #include "svn_string.h"
@@ -17,6 +20,7 @@
 #include "svn_props.h"
 #include "svn_mergeinfo.h"
 #include "svn_version.h"
+
 
 namespace ryppl {
 
@@ -136,30 +140,12 @@ svn_repos_parse_fns2_t parse_vtable =
     close_revision
 };
 
-struct parse_baton_t
-{
-  /* Input and output streams. */
-  svn_stream_t *in_stream;
-  svn_stream_t *out_stream;
-};
-
-/* Helper to open stdio streams */
-
-/* NOTE: we used to call svn_stream_from_stdio(), which wraps a stream
-   around a standard stdio.h FILE pointer.  The problem is that these
-   pointers operate through C Run Time (CRT) on Win32, which does all
-   sorts of translation on them: LF's become CRLF's, and ctrl-Z's
-   embedded in Word documents are interpreted as premature EOF's.
-
-   So instead, we use apr_file_open_std*, which bypass the CRT and
-   directly wrap the OS's file-handles, which don't know or care about
-   translation.  Thus dump/load works correctly on Win32.
-*/
+// Lifted out of subversion/svndumpfilter/main.c
 static svn_error_t*
-create_stdio_stream(svn_stream_t **stream,
-                    APR_DECLARE(apr_status_t) open_fn(apr_file_t **,
-                                                      apr_pool_t *),
-                    apr_pool_t *pool)
+create_stdio_stream(
+    svn_stream_t **stream,
+    APR_DECLARE(apr_status_t) open_fn(apr_file_t **, apr_pool_t *),
+    apr_pool_t *pool)
 {
   apr_file_t *stdio_file;
   apr_status_t apr_err = open_fn(&stdio_file, pool);
@@ -171,24 +157,29 @@ create_stdio_stream(svn_stream_t **stream,
   return SVN_NO_ERROR;
 }
 
-
-static svn_error_t*
-parse_baton_initialize(struct parse_baton_t **pb, apr_pool_t *pool)
+struct parser
 {
-    struct parse_baton_t *baton = static_cast<parse_baton_t*>(
-        apr_palloc(pool, sizeof(*baton)));
+    parser(apr_pool_t* pool)
+        : pool(pool), in_stream(0), out_stream(0), rev_num(0)
+    {
+        /* Read the stream from STDIN.  Users can redirect a file. */
+        check_svn_error(
+            create_stdio_stream(&(this->in_stream), apr_file_open_stdin, pool));
 
-    /* Read the stream from STDIN.  Users can redirect a file. */
-    SVN_ERR(create_stdio_stream(&(baton->in_stream),
-                                apr_file_open_stdin, pool));
+        /* Have the parser dump results to STDOUT. Users can redirect a file. */
+        check_svn_error(
+            create_stdio_stream(&(this->out_stream), apr_file_open_stdout, pool));
+    }
 
-    /* Have the parser dump results to STDOUT. Users can redirect a file. */
-    SVN_ERR(create_stdio_stream(&(baton->out_stream),
-                                apr_file_open_stdout, pool));
+    apr_pool_t* pool;
+    
+    // Input and output streams.
+    svn_stream_t* in_stream;
+    svn_stream_t* out_stream;
 
-    *pb = baton;
-    return SVN_NO_ERROR;
-}
+    // Revision number
+    unsigned rev_num;
+};
 
 }
 
@@ -196,9 +187,7 @@ int main()
 {
     using namespace ryppl;
     
-    /* Create our top-level pool.  Use a separate mutexless allocator,
-     * given this application is single threaded.
-     */
+    // Create our top-level pool.
     apr_allocator_t *allocator;
     if (apr_allocator_create(&allocator))
         return EXIT_FAILURE;
@@ -212,15 +201,29 @@ int main()
     if (svn_error_t* err = svn_fs_initialize(pool))
         return EXIT_FAILURE;
 
-    parse_baton_t* pb;
+    try
+    {
+        parser parser(pool);
     
-    if (parse_baton_initialize(&pb, pool))
+        check_svn_error(
+            svn_repos_parse_dumpstream2(
+                parser.in_stream, &parse_vtable, &parser, NULL, NULL, pool));
+    }
+    catch(svn_error const& x)
+    {
+        std::cerr << "Failed with svn error: " << x.what() << std::endl;
         return EXIT_FAILURE;
-    
-    if (svn_repos_parse_dumpstream2(
-            pb->in_stream, &parse_vtable, pb, NULL, NULL, pool))
+    }
+    catch(std::exception const& x)
+    {
+        std::cerr << "Failed with std::exception: " << x.what() << std::endl;
         return EXIT_FAILURE;
-
+    }
+    catch(...)
+    {
+        std::cerr << "Failed with unknown exception" << std::endl;
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }
 
