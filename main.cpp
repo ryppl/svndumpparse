@@ -2,27 +2,13 @@
 // Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <exception>
-#include <iostream>
 #include "svn_failure.hpp"
 #include "svn_dump_parser.hpp"
-
-#include <svn_repos.h>
-#include "svn_error.h"
-#include "svn_string.h"
-#include "svn_opt.h"
-#include "svn_utf.h"
-#include "svn_dirent_uri.h"
-#include "svn_path.h"
-#include "svn_hash.h"
-#include "svn_repos.h"
-#include "svn_fs.h"
-#include "svn_pools.h"
-#include "svn_sorts.h"
-#include "svn_props.h"
-#include "svn_mergeinfo.h"
-#include "svn_version.h"
-
+#include <exception>
+#include <iostream>
+#include <svn_pools.h>
+#include <svn_io.h>
+#include <svn_fs.h>
 
 namespace ryppl {
 
@@ -45,8 +31,6 @@ create_stdio_stream(
 
 int main()
 {
-    using namespace ryppl;
-    
     // Create our top-level pool.
     apr_allocator_t *allocator;
     if (apr_allocator_create(&allocator))
@@ -60,13 +44,12 @@ int main()
     
     try
     {
-        check_svn_failure(svn_fs_initialize(pool));
+        ryppl::check_svn_failure(svn_fs_initialize(pool));
+        ryppl::svn_dump_parser parse(pool);
         
-        svn_dump_parser parse(pool);
-        
-        parse(create_stdio_stream(apr_file_open_stdin, pool));
+        parse(ryppl::create_stdio_stream(apr_file_open_stdin, pool));
     }
-    catch(svn_failure const& x)
+    catch(ryppl::svn_failure const& x)
     {
         std::cerr << "Failed with svn error: " << x.what() << std::endl;
         return EXIT_FAILURE;
