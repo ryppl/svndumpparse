@@ -17,7 +17,6 @@
 #include "svn_props.h"
 #include "svn_mergeinfo.h"
 #include "svn_version.h"
-#include "libintl.h"
 
 extern "C"
 {
@@ -145,7 +144,7 @@ create_stdio_stream(svn_stream_t **stream,
   apr_status_t apr_err = open_fn(&stdio_file, pool);
 
   if (apr_err)
-    return svn_error_wrap_apr(apr_err, gettext("Can't open stdio file"));
+    return svn_error_wrap_apr(apr_err, "Can't open stdio file");
 
   *stream = svn_stream_from_aprfile2(stdio_file, TRUE, pool);
   return SVN_NO_ERROR;

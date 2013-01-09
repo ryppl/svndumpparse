@@ -6,7 +6,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 find_package(SubversionLibrary 1.78)
 find_package(APR)
-find_package(GettextLibs)
 
 include_directories(${SUBVERSION_INCLUDE_DIRS} ${APR_INCLUDE_DIRS} ${GETTEXT_INCLUDE_DIR})
 
