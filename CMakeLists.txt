@@ -7,11 +7,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 find_package(SubversionLibrary 1.78)
 find_package(APR)
 
-include_directories(${SUBVERSION_INCLUDE_DIRS} ${APR_INCLUDE_DIRS} ${GETTEXT_INCLUDE_DIR})
+include_directories(${SUBVERSION_INCLUDE_DIRS} ${APR_INCLUDE_DIRS})
 
 add_executable(convert
   main.cpp)
 
-target_link_libraries(convert ${SUBVERSION_LIBRARIES} ${APR_LIBRARY} ${GETTEXT_LIBRARIES})
+target_link_libraries(convert ${SUBVERSION_LIBRARIES} ${APR_LIBRARY})
 
 
