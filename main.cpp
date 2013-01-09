@@ -188,10 +188,12 @@ int main()
         return EXIT_FAILURE;
 
     parse_baton_t* pb;
+    
     if (parse_baton_initialize(&pb, pool))
         return EXIT_FAILURE;
-    if (svn_repos_parse_dumpstream2(pb->in_stream, &parse_vtable, pb,
-                                    NULL, NULL, pool))
+    
+    if (svn_repos_parse_dumpstream2(
+            pb->in_stream, &parse_vtable, pb, NULL, NULL, pool))
         return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
