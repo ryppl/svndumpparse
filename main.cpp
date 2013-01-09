@@ -140,7 +140,7 @@ svn_repos_parse_fns2_t parse_vtable =
     close_revision
 };
 
-// Lifted out of subversion/svndumpfilter/main.c
+// Adapted from subversion/svndumpfilter/main.c
 static svn_stream_t*
 create_stdio_stream(
     APR_DECLARE(apr_status_t) open_fn(apr_file_t **, apr_pool_t *),
