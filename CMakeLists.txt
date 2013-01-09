@@ -12,7 +12,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" ST
 endif()
 
 add_executable(modhist
-  main.cpp)
+  main.cpp
+  svn_dump_parser.cpp
+)
 
 foreach(flag ${CXX11_FEATURE_LIST})
   set_property(TARGET modhist
