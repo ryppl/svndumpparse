@@ -15,6 +15,7 @@ add_executable(modhist
   main.cpp
   svn_failure.cpp
   svn_dump_parser.cpp
+  svn_dump_humanizer.cpp
 )
 
 foreach(flag ${CXX11_FEATURE_LIST})

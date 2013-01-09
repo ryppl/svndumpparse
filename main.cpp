@@ -3,7 +3,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "svn_failure.hpp"
-#include "svn_dump_parser.hpp"
+#include "svn_dump_humanizer.hpp"
 #include <exception>
 #include <iostream>
 #include <svn_pools.h>
@@ -45,7 +45,7 @@ int main()
     try
     {
         ryppl::check_svn_failure(svn_fs_initialize(pool));
-        ryppl::svn_dump_parser parse(pool);
+        ryppl::svn_dump_humanizer parse(pool);
         
         parse(ryppl::create_stdio_stream(apr_file_open_stdin, pool));
     }
