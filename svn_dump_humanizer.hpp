@@ -7,6 +7,9 @@
 
 namespace ryppl {
 
+// "Proves the concept" of svn_dump_parser by producing a
+// human-readable rendition of the dump.  This component will probably
+// not be used except for testing.
 struct svn_dump_humanizer : svn_dump_parser
 {
     svn_dump_humanizer(apr_pool_t* pool)

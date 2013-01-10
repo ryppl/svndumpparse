@@ -14,6 +14,8 @@ struct svn_txdelta_window_t;
 
 namespace ryppl {
 
+// An abstract base class for general subversion dump parsing.  It's
+// basically a visitor for the subversion dump format.
 struct svn_dump_parser
 {
     svn_dump_parser(apr_pool_t* pool);
@@ -44,7 +46,7 @@ struct svn_dump_parser
     
     // remove all properties of the current node.
     virtual void remove_node_props() = 0;
-    
+
     virtual void write_fulltext_stream(const char *data, apr_size_t *len) = 0;
     virtual void close_fulltext_stream() = 0;
     

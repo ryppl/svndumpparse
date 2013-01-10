@@ -78,6 +78,14 @@ struct svn_dump_parser::backdoor
     
     // receive a writable stream capable of receiving the current
     // node's fulltext.
+    // 
+    // TODO: If we wanted svn_dump_parser subclasses to know when a
+    // fulltext stream was about to start, this is where we'd call an
+    // appropriate hook function.  Also, if we might not be interested
+    // in actually processing the fulltext, we'd want to give
+    // svn_dump_parser subclasses the ability to set *stream to NULL
+    // so that the subversion dumpfile processor would skip over it.
+    // In our use-case, though, we want to process the fulltext.
     static void set_fulltext(svn_dump_parser* parser, svn_stream_t **stream)
     {
         *stream = svn_stream_create(parser, parser->pool);
@@ -114,7 +122,6 @@ struct svn_dump_parser::backdoor
     {
         parser->close_fulltext_stream();
     }
-    
 };
 
 namespace svn_parse_detail {
@@ -216,6 +223,13 @@ extern "C"
   // For a given node_baton, set handler and handler_baton to a window
   // handler and baton capable of receiving a delta against the node's
   // previous contents.
+  //
+  // TODO: If we wanted svn_dump_parser subclasses to know when a
+  // textdelta stream was about to start, this is where we'd call an
+  // appropriate hook function.  Also, if we might not be interested
+  // in actually processing the text deltas, we'd want to give
+  // svn_dump_parser subclasses the ability to set *handler to NULL
+  // so that the subversion dumpfile processor would skip over them.
   static svn_error_t* apply_textdelta(
       svn_txdelta_window_handler_t *handler, void **handler_baton, void *node_baton)
   {
