@@ -10,7 +10,7 @@ namespace ryppl {
 
 char const* svn_failure::what() const throw()
 {
-    return err->message;
+    return err->message ? err->message : "No Message";
 }
 
 svn_error_t* current_exception_to_svn_error()
