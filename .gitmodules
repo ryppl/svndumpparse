@@ -1,0 +1,3 @@
+[submodule "subconvert"]
+	path = subconvert
+	url = http://github.com/jwiegley/subconvert
