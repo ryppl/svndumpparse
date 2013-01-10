@@ -41,29 +41,30 @@ int main()
     apr_pool_t *pool;
     pool = svn_pool_create_ex(NULL, allocator);
     apr_allocator_owner_set(allocator, pool);
-    
+
+    int exit_code = EXIT_FAILURE;
     try
     {
         ryppl::check_svn_failure(svn_fs_initialize(pool));
         ryppl::svn_dump_humanizer parse(pool);
         
         parse(ryppl::create_stdio_stream(apr_file_open_stdin, pool));
+        exit_code = EXIT_SUCCESS;
     }
     catch(ryppl::svn_failure const& x)
     {
         std::cerr << "Failed with svn error: " << x.what() << std::endl;
-        return EXIT_FAILURE;
     }
     catch(std::exception const& x)
     {
         std::cerr << "Failed with std::exception: " << x.what() << std::endl;
-        return EXIT_FAILURE;
     }
     catch(...)
     {
         std::cerr << "Failed with unknown exception" << std::endl;
-        return EXIT_FAILURE;
     }
-    return EXIT_SUCCESS;
+    
+    svn_pool_destroy(pool);
+    return exit_code;
 }
 
