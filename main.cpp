@@ -32,6 +32,7 @@ create_stdio_stream(
 int main()
 {
     // Create our top-level pool.
+    apr_initialize();
     apr_allocator_t *allocator;
     if (apr_allocator_create(&allocator))
         return EXIT_FAILURE;
