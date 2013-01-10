@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake ${CMAKE_CURRENT_LIST_DIR}/cmake/cmake-cxx11/Modules)
+include(CheckCXX11Features)
 
 find_package(SubversionLibrary 1.78)
 find_package(APR)
