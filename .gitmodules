@@ -1,3 +1,0 @@
-[submodule "cmake/cmake-cxx11"]
-	path = cmake/cmake-cxx11
-	url = git://anongit.kde.org/scratch/dakon/cmake-cxx11.git
