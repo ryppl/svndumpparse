@@ -23,43 +23,50 @@ struct svn_dump_parser
 
     class backdoor;
  private: // virtual functions
-    friend class backdoor;
-    
-    // The parser has discovered a new revision record
-    virtual void begin_revision(apr_hash_t *headers, apr_pool_t *pool) = 0;
-
+    //
+    // Top-level events
+    //    
     // The parser has discovered a new uuid record
     virtual void uuid_record(const char *uuid, apr_pool_t *pool) = 0;
 
-    // The parser has discovered a new node record within the current
-    // revision represented by revision_baton.
-    virtual void begin_node(apr_hash_t *headers, apr_pool_t *pool) = 0;
-    
-    // set a named property of the current revision to value. 
-    virtual void set_revision_property(const char *name, const svn_string_t *value) = 0;
-    
-    // set a named property of the current node to value. 
-    virtual void set_node_property(const char *name, const svn_string_t *value) = 0;
-    
-    // delete a named property of the current node
-    virtual void delete_node_property(const char *name) = 0;
-    
-    // remove all properties of the current node.
-    virtual void remove_node_props() = 0;
+    // The parser has discovered a new revision record
+    virtual void begin_revision(apr_hash_t *headers, apr_pool_t *pool) = 0;
 
-    virtual void write_fulltext_stream(const char *data, apr_size_t *len) = 0;
-    virtual void close_fulltext_stream() = 0;
-    
-    // For a given node_baton, set handler and handler_baton to a window
-    // handler and baton capable of receiving a delta against the node's
-    // previous contents.
-    virtual void apply_textdelta(svn_txdelta_window_t *window) = 0;
-    
+    // the named property of the current revision to was set to value. 
+    virtual void set_revision_property(const char *name, const svn_string_t *value) = 0;
+
+    // The parser has reached the end of the current revision
+    virtual void end_revision() = 0;
+
+    //
+    // Events within a given revision
+    //    
+    // The parser has discovered a new node (file) record
+    virtual void begin_node(apr_hash_t *headers, apr_pool_t *pool) = 0;
+
     // The parser has reached the end of the current node
     virtual void end_node() = 0;
     
-    // The parser has reached the end of the current revision
-    virtual void end_revision() = 0;
+    //
+    // Events within a given node
+    //
+    // the named property of the current node was set to value
+    virtual void set_node_property(const char *name, const svn_string_t *value) = 0;
+    
+    // the named property of the current node was deleted
+    virtual void delete_node_property(const char *name) = 0;
+    
+    // all properties of the current node were deleted
+    virtual void remove_node_props() = 0;
+
+    // The given fulltext provides the next section of the node's contents
+    virtual void write_fulltext_stream(const char *data, apr_size_t *len) = 0;
+    // There are no more fulltext sections in this node
+    virtual void close_fulltext_stream() = 0;
+    
+    // The given text delta should be applied against the node's
+    // previous contents.
+    virtual void apply_textdelta(svn_txdelta_window_t *window) = 0;
     
  private:
     apr_pool_t* pool;

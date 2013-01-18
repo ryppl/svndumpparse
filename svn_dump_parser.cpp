@@ -45,32 +45,31 @@ struct svn_dump_parser::backdoor
         parser->uuid_record(uuid, pool);
     }
 
-    // The parser has discovered a new node record within the current
-    // revision represented by revision_baton.
+    // The parser has discovered a new node (file) record
     static void begin_node(svn_dump_parser* parser, apr_hash_t *headers, apr_pool_t *pool)
     {
         parser->begin_node(headers, pool);
     }
     
-    // set a named property of the current revision to value. 
+    // the named property of the current revision to was set to value. 
     static void set_revision_property(svn_dump_parser* parser, const char *name, const svn_string_t *value)
     {
         parser->set_revision_property(name, value);
     }
     
-    // set a named property of the current node to value. 
+    // the named property of the current node was set to value
     static void set_node_property(svn_dump_parser* parser, const char *name, const svn_string_t *value)
     {
         parser->set_node_property(name, value);
     }
     
-    // delete a named property of the current node
+    // the named property of the current node was deleted
     static void delete_node_property(svn_dump_parser* parser, const char *name)
     {
         parser->delete_node_property(name);
     }
     
-    // remove all properties of the current node.
+    // all properties of the current node were deleted
     static void remove_node_props(svn_dump_parser* parser)
     {
         parser->remove_node_props();
@@ -93,8 +92,7 @@ struct svn_dump_parser::backdoor
         svn_stream_set_close(*stream, text_stream_closer);
     }
     
-    // For a given node_baton, set handler and handler_baton to a window
-    // handler and baton capable of receiving a delta against the node's
+    // The given text delta should be applied against the node's
     // previous contents.
     static void apply_textdelta(svn_dump_parser* parser, svn_txdelta_window_t *window)
     {
@@ -113,11 +111,13 @@ struct svn_dump_parser::backdoor
         parser->end_revision();
     }
 
+    // The given fulltext provides the next section of the node's contents
     static void write_fulltext_stream(svn_dump_parser* parser, const char *data, apr_size_t *len)
     {
         parser->write_fulltext_stream(data, len);
     }
     
+    // There are no more fulltext sections in this node
     static void close_fulltext_stream(svn_dump_parser* parser)
     {
         parser->close_fulltext_stream();
